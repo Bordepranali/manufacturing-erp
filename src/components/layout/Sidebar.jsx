@@ -1,15 +1,15 @@
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Boxes, 
-  Factory, 
-  ClipboardCheck, 
-  Users, 
-  Wrench, 
-  BarChart3, 
-  Settings, 
-  ChevronDown, 
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Boxes,
+  Factory,
+  ClipboardCheck,
+  Users,
+  Wrench,
+  BarChart3,
+  Settings,
+  ChevronDown,
   LogOut,
   Truck,
   UserRound,
@@ -17,16 +17,18 @@ import {
   PackageCheck,
   CreditCard,
   ArrowRightLeft,
-   Layers3,
+  Layers3,
   ClipboardList,
   ShieldAlert,
   ShoppingBag,
   CalendarDays,
-WalletCards,
-Banknote,
-UsersRound,
+  WalletCards,
+  Banknote,
+  UsersRound,
   ShieldCheck,
-  Building2
+  Building2,
+  Menu,
+  X
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -248,9 +250,18 @@ const menuGroups = [
 function Sidebar() {
   const [openGroups, setOpenGroups] = useState({
     Masters: true,
-    Operations: true,
-    Management: true,
+    Purchase: true,
+    Inventory: true,
+    Production: true,
+    Quality: true,
+    Sales: true,
+    "HR & Payroll": true,
+    Maintenance: true,
+    Reports: true,
+    Settings: true
   });
+
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -258,87 +269,131 @@ function Sidebar() {
   const toggleGroup = (title) => {
     setOpenGroups((prev) => ({
       ...prev,
-      [title]: !prev[title],
+      [title]: !prev[title]
     }));
+  };
+
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
   };
 
   const handleLogout = () => {
     logout();
     navigate("/login");
+    setMobileOpen(false);
   };
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-brand-icon">
-          <Factory size={22} />
-        </div>
+    <>
+      <button
+        className="mobile-menu-button"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open navigation"
+      >
+        <Menu size={22} />
+      </button>
 
-        <div>
-          <h2>ManufactureX</h2>
-          <span>Manufacturing ERP</span>
-        </div>
-      </div>
+      {mobileOpen && (
+        <div
+          className="mobile-sidebar-overlay"
+          onClick={closeMobileMenu}
+        />
+      )}
 
-      <div className="sidebar-menu">
-        {menuGroups.map((group) => (
-          <div className="menu-group" key={group.title}>
-            {group.title !== "Main" && (
-              <button
-                className="menu-group-title"
-                onClick={() => toggleGroup(group.title)}
-              >
-                <span>{group.title}</span>
-                <ChevronDown
-                  size={15}
-                  className={openGroups[group.title] ? "" : "rotate"}
-                />
-              </button>
-            )}
+      <aside className={`sidebar ${mobileOpen ? "mobile-open" : ""}`}>
+        <div className="sidebar-mobile-header">
+          <div className="sidebar-brand">
+            <div className="sidebar-brand-icon">
+              <Factory size={22} />
+            </div>
 
-            {(group.title === "Main" || openGroups[group.title]) && (
-              <div className="menu-items">
-                {group.items.map((item) => {
-                  const Icon = item.icon;
-
-                  return (
-                    <NavLink
-                      key={item.label}
-                      to={item.path}
-                      className={({ isActive }) =>
-                        `sidebar-link ${isActive ? "active" : ""}`
-                      }
-                    >
-                      <Icon size={18} />
-                      <span>{item.label}</span>
-                    </NavLink>
-                  );
-                })}
-              </div>
-            )}
+            <div>
+              <h2>ManufactureX</h2>
+              <span>Manufacturing ERP</span>
+            </div>
           </div>
-        ))}
-      </div>
 
-      <div className="sidebar-user">
-        <div className="user-avatar">
-          {user?.name?.charAt(0).toUpperCase() || "A"}
+          <button
+            className="sidebar-close-button"
+            onClick={closeMobileMenu}
+            aria-label="Close navigation"
+          >
+            <X size={20} />
+          </button>
         </div>
 
-        <div className="user-info">
-          <strong>{user?.name || "Admin User"}</strong>
-          <span>{user?.role || "Admin"}</span>
+        <div className="sidebar-brand sidebar-desktop-brand">
+          <div className="sidebar-brand-icon">
+            <Factory size={22} />
+          </div>
+
+          <div>
+            <h2>ManufactureX</h2>
+            <span>Manufacturing ERP</span>
+          </div>
         </div>
 
-        <button
-          className="logout-button"
-          onClick={handleLogout}
-          title="Logout"
-        >
-          <LogOut size={18} />
-        </button>
-      </div>
-    </aside>
+        <div className="sidebar-menu">
+          {menuGroups.map((group) => (
+            <div className="menu-group" key={group.title}>
+              {group.title !== "Main" && (
+                <button
+                  className="menu-group-title"
+                  onClick={() => toggleGroup(group.title)}
+                >
+                  <span>{group.title}</span>
+                  <ChevronDown
+                    size={15}
+                    className={openGroups[group.title] ? "" : "rotate"}
+                  />
+                </button>
+              )}
+
+              {(group.title === "Main" || openGroups[group.title]) && (
+                <div className="menu-items">
+                  {group.items.map((item) => {
+                    const Icon = item.icon;
+
+                    return (
+                      <NavLink
+                        key={item.label}
+                        to={item.path}
+                        onClick={closeMobileMenu}
+                        className={({ isActive }) =>
+                          `sidebar-link ${isActive ? "active" : ""}`
+                        }
+                      >
+                        <Icon size={18} />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="sidebar-user">
+          <div className="user-avatar">
+            {user?.name?.charAt(0).toUpperCase() || "A"}
+          </div>
+
+          <div className="user-info">
+            <strong>{user?.name || "Admin User"}</strong>
+            <span>{user?.role || "Admin"}</span>
+          </div>
+
+          <button
+            className="logout-button"
+            onClick={handleLogout}
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
 
